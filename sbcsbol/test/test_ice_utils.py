@@ -11,11 +11,10 @@ To view a copy of this license, visit <http://opensource.org/licenses/MIT/>.
 import getpass
 import unittest
 
+from sbcsbol import sbol_utils
+from sbcsbol.ice_utils import ICEClient, ICEEntry
 from sbol.sbol import Document
-
-from synbiochem.utils import sbol_utils
-from synbiochem.utils.ice_utils import ICEClient, ICEEntry
-import synbiochem.utils.ice_utils as ice_utils
+import sbcsbol.ice_utils as ice_utils
 
 
 class TestICEEntry(unittest.TestCase):

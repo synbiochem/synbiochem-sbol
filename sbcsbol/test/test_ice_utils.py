@@ -147,7 +147,7 @@ class TestICEClient(unittest.TestCase):
         sbol_doc = Document()
         sbol_doc.read('sbol.xml')
 
-        ice_entry_in = ICEEntry(typ='PLASMID', sbol_doc=sbol_doc)
+        ice_entry_in = ICEEntry(typ='PART', sbol_doc=sbol_doc)
         self.__ice_client.set_ice_entry(ice_entry_in)
 
         ice_entry_out = self.__ice_client.get_ice_entry(

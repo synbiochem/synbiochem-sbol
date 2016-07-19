@@ -266,16 +266,16 @@ def _add_component(document, display_id, name=None, description=None,
                    typ=None, uri_prefix=_DEFAULT_URI_PREFIX):
     '''Adds a DNAComponent to a Document.'''
     comp = DNAComponent(document, _get_uri(uri_prefix))
-    comp.display_id = display_id
+    comp.display_id = str(display_id)
 
     if name is not None:
-        comp.name = name
+        comp.name = str(name)
 
     if description is not None:
-        comp.description = description
+        comp.description = str(description)
 
     if typ is not None:
-        comp.type = typ
+        comp.type = str(typ)
 
     return comp
 

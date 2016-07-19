@@ -8,6 +8,7 @@ To view a copy of this license, visit <http://opensource.org/licenses/MIT/>.
 @author:  pablocarbonell / neilswainston / alanwilliams
 '''
 # pylint: disable=too-many-arguments
+# pylint: disable=too-many-instance-attributes
 import json
 import tempfile
 
@@ -33,6 +34,9 @@ class ICEEntry(object):
         if metadata is None:
             self.__metadata = {'type': typ}
         else:
+            if 'type' not in metadata:
+                metadata['type'] = typ
+
             self.__metadata = metadata
 
     def get_ice_number(self):
@@ -98,7 +102,7 @@ class ICEClient(object):
     '''Class representing an ICE client.'''
 
     def __init__(self, url, username, psswrd, id_prefix=_DEFAULT_ID_PREFIX):
-        self.__url = url + ('' if url[-1] == '/' else '/')
+        self.__url = url[:-1] if url[-1] == '/' else url
         self.__username = username
         self.__psswrd = psswrd
         self.__id_prefix = id_prefix
@@ -106,7 +110,7 @@ class ICEClient(object):
         self.__headers = {'Accept': 'application/json',
                           'Content-Type': 'application/json'}
 
-        self.__sid = self.reconnect()
+        self.__sid, self.__user, self.__email = self.reconnect()
         self.__headers[_SESSION_KEY] = self.__sid
 
     def reconnect(self):
@@ -118,7 +122,9 @@ class ICEClient(object):
             resp = self.__get_access_token(
                 '/accesstokens', self.__username, self.__psswrd)
 
-        return resp['sessionId']
+        return resp['sessionId'], \
+            resp['firstName'] + ' ' + resp['lastName'], \
+            resp['email']
 
     def get_ice_entry(self, ice_id):
         '''Gets an ICEEntry object from the ICE database.'''
@@ -139,7 +145,7 @@ class ICEClient(object):
             response = self.__create_entry(ice_entry)
         else:
             response = self.__update_entry(ice_entry.get_ice_number(),
-                                           ice_entry.get_metadata())
+                                           self.__form_metadata(ice_entry))
 
         metadata = self.__get_meta_data(self.__get_ice_id(response['id']))
         ice_entry.set_values(metadata)
@@ -208,6 +214,18 @@ class ICEClient(object):
                                                      'password': psswrd}),
                                          self.__headers))
 
+    def __form_metadata(self, ice_entry):
+        '''Forms metadata dictionary.'''
+        metadata = ice_entry.get_metadata()
+
+        if 'creator' not in metadata:
+            metadata['creator'] = self.__user
+
+        if 'creatorEmail' not in metadata:
+            metadata['creatorEmail'] = self.__email
+
+        return metadata
+
     def __upload_seq_file(self, record_id, typ, filename):
         '''Uploads a sequence file (not necessarily SBOL).'''
         return _read_resp(net_utils.post_file(self.__url +
@@ -246,7 +264,7 @@ class ICEClient(object):
         '''Creates a new ICE entry in the database.'''
         url = self.__url + '/rest/parts'
         return _read_resp(
-            net_utils.post(url, json.dumps(ice_entry.get_metadata()),
+            net_utils.post(url, json.dumps(self.__form_metadata(ice_entry)),
                            self.__headers))
 
     def __update_entry(self, ice_id, metadata):

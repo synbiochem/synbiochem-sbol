@@ -34,7 +34,7 @@ def set_sequence(document, seq, component=None,
                  uri_prefix=_DEFAULT_URI_PREFIX):
     '''Sets the DNASequence of a Document.'''
     dna_seq = DNASequence(document, _get_uri(uri_prefix))
-    dna_seq.nucleotides = seq.lower()
+    dna_seq.nucleotides = str(seq).lower()
 
     if component is None:
         component = document.components[0]

@@ -166,6 +166,7 @@ class ICEClient(object):
 
         metadata = self.__get_meta_data(self.__get_ice_id(response['id']))
         ice_entry.set_values(metadata)
+        return response['id']
 
     # TODO: ensure rebuild_blast works.
     def rebuild_blast(self):

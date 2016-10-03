@@ -247,7 +247,7 @@ def _get_sbol(parent_doc, seq, start, end, uri_prefix):
 
     doc = create_doc(parent_comp.display_id + frag_str,
                      parent_comp.name + frag_str,
-                     parent_comp.description + frag_str, uri_prefix)
+                     parent_comp.description + frag_str, uri_prefix=uri_prefix)
 
     set_sequence(doc, seq)
 
